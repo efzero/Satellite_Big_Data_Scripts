@@ -83,6 +83,19 @@ class fpar_utils:
       assert False
       return None
 
+  def get_fpar_bound(self, lat_ind, lon_ind):
+
+    assert lat_ind >= 0 and lon_ind >= 0
+    lu = self.get_fpar_coords(lat_ind, lon_ind)
+    lb = self.get_fpar_coords(lat_ind+1, lon_ind)
+    ru = self.get_fpar_coords(lat_ind, lon_ind+1)
+    rb = self.get_fpar_coords(lat_ind+1, lon_ind+1)
+    max_lat, min_lat = max(lu[1], lb[1]), min(lu[1], lb[1])
+    max_lon, min_lon = max(lu[0], ru[0]), min(lu[0], ru[0])
+    return [min_lon, max_lon, min_lat, max_lat]
+
+
+
   #input the indices of fpar data
   #return the corresponding fpar values and qc values
   #parameter: fpar_dat: the global fpar data, fpar_qc: the global qc data, indices: the corresponding indices

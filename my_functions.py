@@ -81,8 +81,6 @@ def coords_to_ind(lon, lat):
     lat_ind = int(lat_diff / COORD_INC)
     return (lon_ind, lat_ind)
 
-def hasdf():
-    print('shabi')
 
 def get_by_box(year, llcrnrlon, llcrnrlat, urcrnrlon, urcrnrlat):
     from io import StringIO
