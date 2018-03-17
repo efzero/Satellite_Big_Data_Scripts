@@ -26,15 +26,11 @@ def test_cdl_box():
 def test_cdl_proportion():
 	cd = cdl_utils()
 	cd.load_np_cdl('cdl_chicago.npy')
-	min_lon = -89
-	max_lon = -88
-	min_lat = 41
+	min_lon = -89.0
+	max_lon = -88.92
+	min_lat = 41.89
 	max_lat = 42
 	dat = cd.get_cdl_box_data(min_lon, max_lon, min_lat, max_lat)
 	unique_elements, counts_elements = np.unique(dat, return_counts=True)
 	proportion = cd.get_proportion(dat, cd.cdl_data)
-	print(proportion)
 	return proportion
-
-
-test_cdl_proportion()

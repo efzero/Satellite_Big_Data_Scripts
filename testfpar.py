@@ -99,10 +99,7 @@ def test_fp_corners(lat_ind, lon_ind):
 	fpar_grid = fp.get_fpar_box(lat_ind, lon_ind)
 	startpoint, endpoint = fp.get_fpar_box(0,0), fp.get_fpar_box(fp.lat_num-1, fp.lon_num -1)
 	assert startpoint[3][0] - fp.west <= 0.0005 and startpoint[3][1] - fp.north <= 0.0005
-	assert endpoint[3][0] - fp.east <= 0.0005 and endpoint[3][1] - fp.south <= 0.0005
-
-
-
+	assert endpoint[0][0] - fp.east <= 0.0005 and endpoint[0][1] - fp.south <= 0.0005
 	return fpar_grid
 
 
@@ -116,9 +113,16 @@ def test_cdl_indices():
 	cdl_data = np.load()
 
 
+def test_fp_bound(lat_ind, lon_ind):
+	fp = fpar_utils()
+	box = fp.get_fpar_bound(lat_ind, lon_ind)
+	startpoint, endpoint = fp.get_fpar_bound(0,0), fp.get_fpar_bound(fp.lat_num-1, fp.lon_num -1)
+	print(startpoint, endpoint)
+	assert startpoint[0] - fp.west <= 0.0005 and startpoint[3] - fp.north <= 0.0005
+	assert endpoint[1] - fp.east <= 0.0005 and endpoint[2] - fp.south <= 0.0005
+	return box
 
-
-
+# print(test_fp_bound(2000, 5000))
 # pts = test_fpar_box()
 # fpar_, fpar_qc = test_io()
 # fp = fpar_utils()
