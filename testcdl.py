@@ -34,3 +34,20 @@ def test_cdl_proportion():
 	unique_elements, counts_elements = np.unique(dat, return_counts=True)
 	proportion = cd.get_proportion(dat, cd.cdl_data)
 	return proportion
+
+
+def test_cdl_indices_geo():
+	cd = cdl_utils()
+	cd.load_np_cdl('cdl_chicago.npy')
+	p1 = (41.5, -88)
+	p2 = (41.7, -87.5)
+	p3 = (40.7, -87.6)
+	p4 = (40.6, -88.1)
+	ind = cd.get_cdl_indices_geo(p1, p2, p3, p4)
+	vals = cd.get_cdl_by_indices(ind, cd.cdl_data)
+	print(len(ind))
+
+	return
+
+
+test_cdl_indices_geo()

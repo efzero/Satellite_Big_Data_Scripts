@@ -25,6 +25,7 @@ class cdl_utils:
 		self.y_step = 0.000325895819831
 
  
+
 	def load_cdl(self, path):
 		data = gdal.Open(path)
 		data = data.ReadAsArray()
@@ -89,9 +90,10 @@ class cdl_utils:
 		return np.array(cdl_data) 
 
 
-	#input the four lu, ru, rb, lb points
+
+	#input the four lu, ru, rb, lb points with albert projection
 	#return according indices in cdl data
-	def get_cdl_indices(self, lu, ru, rb, lb):
+	def get_cdl_indices_albert(self, lu, ru, rb, lb):
 
 		#cdl projection returns (lon_projection, lat_projection)
 		ul = self.proj_to_ind(self.getCDLprojection(lu[0], lu[1]))
@@ -101,3 +103,36 @@ class cdl_utils:
 		box = Polygon([ul, ur, br, bl])
 		indices = points_inside_polygon(box, ul, ur, br, bl)
 		return np.array(indices)
+
+
+	#input the four points (polygon) with geographical projection
+	#return according indices in cdl data
+	def get_cdl_indices_geo(self, lu, ru, rb, lb):
+		p1 = self.convert_to_ind(lu)
+		p2 = self.convert_to_ind(ru)
+		p3 = self.convert_to_ind(rb)
+		p4 = self.convert_to_ind(lb)
+		box = Polygon([p1, p2, p3, p4])
+		indices = points_inside_polygon(box, p1, p2, p3, p4)
+		return np.array(indices)
+
+
+	#input the latitude and longitude (lat, lon)
+	#return according indices in cdl data
+	def convert_to_ind(self,point):
+		lat, lon = point[0], point[1]
+		col = int((lon - self.min_lon)/self.y_step)
+		row = int((lat - self.max_lat)/self.x_step)
+		return (row,col)
+
+
+	#input the cdl_array and indices
+	#return the cdl value
+	def get_cdl_by_indices(self, indices, cdl_array):
+		cdl_values = []
+		for i in range(len(indices)):
+			row, col = indices[i, 0], indices[i, 1]
+			cdl_data = cdl_array[row, col]
+			cdl_values.append(cdl_data)
+
+		return cdl_values
