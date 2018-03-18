@@ -59,14 +59,17 @@ class cdl_utils:
 
 
 		unique_elements, counts_elements = np.unique(submat, return_counts=True)
-		indices_map = {1:0, 5:1, 64:2, 176:3}
+		indices_map = {1:0, 5:1, 176:2}
 		for num, count in zip(unique_elements, counts_elements):
-			if num == 1 or num == 5 or num == 64 or num == 176:
+			if num == 1 or num == 5 or num == 176:
 				row[indices_map[num]] = count
-
+			else:
+				row[3] += count
+		
 		if np.sum(row) == 0:
 			return row
-		row = row/np.sum(row)
+
+		row = row/(submat.shape[0]*submat.shape[1])
 		return row
 
 
@@ -78,11 +81,11 @@ class cdl_utils:
 		end_col = int((max_lon - self.min_lon)/self.y_step)
 		start_row = int((max_lat - self.max_lat)/self.x_step)
 		end_row = int((min_lat - self.max_lat)/self.x_step)
-		print(start_row, end_row, start_col, end_col)
+		# print(start_row, end_row, start_col, end_col)
 		assert start_col <= end_col and start_row <= end_row and start_row >= 0 and start_col >= 0
 		assert end_col < self.cdl_data.shape[1] and end_row < self.cdl_data.shape[0]
 		cdl_data = self.cdl_data[start_row: end_row+1, start_col: end_col+1]
-		print(cdl_data.shape)
+		# print(cdl_data.shape)
 		return np.array(cdl_data) 
 
 

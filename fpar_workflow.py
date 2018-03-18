@@ -17,7 +17,6 @@ class Fpar_flow:
 #input a polygon
 #return fpar regression result inside that polygon
 
-
 	def preprocess(self, fpar_path, cdl_path):
 		self.fpar_.read_fpar(fpar_path)
 		self.cdl_.load_np_cdl(cdl_path)
@@ -37,8 +36,8 @@ class Fpar_flow:
 
 
 	def get_cdl_matrix(self):
-		assert self.fp_ptrs != None
-		assert self.cdl_.cdl_data != None
+		assert self.fp_ptrs is not None
+		assert self.cdl_.cdl_data is not None
 
 		mat = []
 
@@ -49,21 +48,24 @@ class Fpar_flow:
 			proportion = self.cdl_.get_proportion(cur_cdl_box, self.cdl_.cdl_data)
 			mat.append(proportion)
 		mat = np.array(mat)
+		# mat = np.append(mat, np.ones((mat.shape[0],1)), axis=1)
 		self.cdl_matrix = mat
 
 
 	def run_regression(self):
 		assert self.cdl_matrix != None and self.fpar_vals != None
 		result = lstsq(self.cdl_matrix, self.fpar_vals)
+		self.reg_coeffs = result[0]
 		print(result)
+		return result
 
 
 
-	def init_workflow(self, fpar_path, cdl_path):
-		p4 = (40.36067026099156,-88.0386962890625)
-		p3 = (40.36067026099156, -87.56082275390625)
-		p2 = (41.01638178482896,-87.56082275390625)
-		p1 = (41.01638178482896, -88.0386962890625)
+	def init_workflow(self, fpar_path, cdl_path, p1, p2, p3, p4):
+		# p4 = (41.47067026099156,-88.7186962890625)
+		# p3 = (41.47067026099156, -87.56082275390625)
+		# p2 = (41.81638178482896,-87.56082275390625)
+		# p1 = (41.81638178482896, -88.7186962890625)
 
 		# fpar_path = 'FPAR_A2016241.hdf'
 		# cdl_path = 'cdl_chicago.npy'
@@ -72,13 +74,14 @@ class Fpar_flow:
 		self.get_cdl_matrix()
 		self.run_regression()
 
-	def continue_workflow(self, fpar_path):
-		p4 = (40.36067026099156,-88.0386962890625)
-		p3 = (40.36067026099156, -87.56082275390625)
-		p2 = (41.01638178482896,-87.56082275390625)
-		p1 = (41.01638178482896, -88.0386962890625)
+	def continue_workflow(self, fpar_path, p1, p2, p3, p4):
+		# p4 = (41.47067026099156,-88.7186962890625)
+		# p3 = (41.47067026099156, -87.56082275390625)
+		# p2 = (41.81638178482896,-87.56082275390625)
+		# p1 = (41.81638178482896, -88.7186962890625)
 		self.load_fpar(fpar_path)
 		self.get_fpar_vector(p1, p2, p3, p4)
 		self.get_cdl_matrix()
 		self.run_regression()
+
 
