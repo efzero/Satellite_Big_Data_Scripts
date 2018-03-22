@@ -32,7 +32,7 @@ def test_cdl_proportion():
 	max_lat = 42
 	dat = cd.get_cdl_box_data(min_lon, max_lon, min_lat, max_lat)
 	unique_elements, counts_elements = np.unique(dat, return_counts=True)
-	proportion = cd.get_proportion(dat, cd.cdl_data)
+	proportion = cd.get_proportion(dat)
 	return proportion
 
 
@@ -45,7 +45,9 @@ def test_cdl_indices_geo():
 	p4 = (40.6, -88.1)
 	ind = cd.get_cdl_indices_geo(p1, p2, p3, p4)
 	vals = cd.get_cdl_by_indices(ind, cd.cdl_data)
-	print(len(ind))
+
+	proportion = cd.get_proportion(np.array(vals))
+	print(len(ind), proportion)
 
 	return
 

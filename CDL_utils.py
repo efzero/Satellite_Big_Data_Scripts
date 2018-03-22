@@ -53,7 +53,7 @@ class cdl_utils:
 	#input a 2d matrix consist of cdl labels
 	#return the proportion of each type of crops in that matrix
 
-	def get_proportion(self, submat, cdl_data):
+	def get_proportion(self, submat):
 
 
 		row = np.array([0,0,0,0], dtype=float)
@@ -70,7 +70,7 @@ class cdl_utils:
 		if np.sum(row) == 0:
 			return row
 
-		row = row/(submat.shape[0]*submat.shape[1])
+		row = row/np.sum(counts_elements)
 		return row
 
 

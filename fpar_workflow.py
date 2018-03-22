@@ -45,7 +45,7 @@ class Fpar_flow:
 			#lat_ind, lon_ind
 			fpar_box = self.fpar_.get_fpar_bound(point[0], point[1])
 			cur_cdl_box = self.cdl_.get_cdl_box_data(fpar_box[0],fpar_box[1],fpar_box[2],fpar_box[3])
-			proportion = self.cdl_.get_proportion(cur_cdl_box, self.cdl_.cdl_data)
+			proportion = self.cdl_.get_proportion(cur_cdl_box)
 			mat.append(proportion)
 		mat = np.array(mat)
 		# mat = np.append(mat, np.ones((mat.shape[0],1)), axis=1)
