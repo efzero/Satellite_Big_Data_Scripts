@@ -1,5 +1,5 @@
 from shapely.geometry import Polygon, Point
-
+from math import ceil, floor
 import matplotlib.pyplot as plt
 import math
 import numpy as np
@@ -17,46 +17,31 @@ def search__bounds(polygon, left,right, lft_ind, rt_ind, cur_row, mid_point):
 
     lft_point = None
     rt_point = None
-
     if l and r:
-
         return left, right
     #left and right are not contained in the polygon
     else:
-
         #binary search
         #initialize midpoint, left pointer and right pointer
         mid_ = mid_point
         lft_ptr, rt_ptr = lft_ind, rt_ind
-
         while math.fabs(mid_ - lft_ptr) >= 0.5 or math.fabs(mid_ - rt_ptr) >= 0.5:
-
             Mid_point = Point(mid_, cur_row)
-
             if polygon.contains(Mid_point):
                 rt_ptr = mid_
-
             else:
                 lft_ptr = mid_
-
             mid_ = (lft_ptr + rt_ptr)/2
-
         lft_point = mid_
-
         mid_ = mid_point
         lft_ptr, rt_ptr = lft_ind, rt_ind
-
         while math.fabs(mid_ - rt_ptr) >= 0.5 or math.fabs(mid_ - lft_ptr) >= 0.5:
-            
             Mid_point = Point(mid_, cur_row)
-
-            
             if polygon.contains(Mid_point):
                 lft_ptr = mid_
             else:
                 rt_ptr = mid_
             mid_ = (lft_ptr + rt_ptr)/2
-
         rt_point = mid_
 
     return lft_point, rt_point
@@ -65,7 +50,6 @@ def search__bounds(polygon, left,right, lft_ind, rt_ind, cur_row, mid_point):
 
 #the order of four points
 def points_inside_polygon(polygon, pt1, pt2, pt3, pt4):
-
 
     coords_set = set(polygon.exterior.coords)
     centroid_x, centroid_y = polygon.centroid.x, polygon.centroid.y
@@ -78,7 +62,6 @@ def points_inside_polygon(polygon, pt1, pt2, pt3, pt4):
     max_x, min_x = np.max(pt_vector[:,0]), np.min(pt_vector[:,0])
     argmax_y, argmin_y = np.argmax(pt_vector[:,1]), np.argmin(pt_vector[:,1])
     argmax_x, argmin_x = np.argmax(pt_vector[:,0]), np.argmin(pt_vector[:,0])
-
 
     ret = []
     
@@ -106,10 +89,6 @@ def points_inside_polygon(polygon, pt1, pt2, pt3, pt4):
     return ret
 
 
-
-
-    
-
-
-
-            
+def find_nearest_border(min_lon, max_lon, min_lat, max_lat):
+    #extend the rectangle to integer points
+    return [floor(min_lon), ceil(max_lon), floor(min_lat), ceil(max_lat)]
