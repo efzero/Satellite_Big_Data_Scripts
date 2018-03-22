@@ -82,6 +82,8 @@ class cdl_utils:
 		end_col = int((max_lon - self.min_lon)/self.y_step)
 		start_row = int((max_lat - self.max_lat)/self.x_step)
 		end_row = int((min_lat - self.max_lat)/self.x_step)
+		if start_row < 0 or start_col < 0:
+			print(min_lon, max_lat) 
 		# print(start_row, end_row, start_col, end_col)
 		assert start_col <= end_col and start_row <= end_row and start_row >= 0 and start_col >= 0
 		assert end_col < self.cdl_data.shape[1] and end_row < self.cdl_data.shape[0]

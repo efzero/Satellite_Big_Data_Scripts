@@ -89,6 +89,8 @@ def points_inside_polygon(polygon, pt1, pt2, pt3, pt4):
     return ret
 
 
+#given a floating point rectangular box
+#return an integer rectangular box containing the origin box
 def find_nearest_border(min_lon, max_lon, min_lat, max_lat):
     #extend the rectangle to integer points
     return [floor(min_lon), ceil(max_lon), floor(min_lat), ceil(max_lat)]
