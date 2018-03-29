@@ -34,6 +34,7 @@ def main():
 	model2 = sm.OLS(y, X_).fit()
 	print(model.summary())
 	print(model2.summary())
+	return X,y
 
 		# g_flow.run_gome_regression()
 

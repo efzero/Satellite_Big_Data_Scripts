@@ -33,8 +33,8 @@ class GNOME_utils:
 		data_clouds = dat.variables['cloud_fraction'][:]
 		data_sifs = dat.variables['Daily_averaged_SIF']
 		data_time = dat.variables['time']
-		filtered_lon_ind = np.where((data_lons >= self.min_lon + 1.2)&(data_lons <= self.max_lon - 1.2))
-		filtered_lat_ind = np.where((data_lats >= self.min_lat + 0.5)&(data_lats <= self.max_lat - 0.5))
+		filtered_lon_ind = np.where((data_lons >= self.min_lon + 1.6)&(data_lons <= self.max_lon - 1.6))
+		filtered_lat_ind = np.where((data_lats >= self.min_lat + 0.7)&(data_lats <= self.max_lat - 0.7))
 		indices = np.intersect1d(filtered_lon_ind, filtered_lat_ind)
 
 		if len(indices) == 0:
