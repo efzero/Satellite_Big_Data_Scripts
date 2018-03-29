@@ -16,40 +16,74 @@ class Gome_workflow:
 		self.fp_workflow = None
 
 	def build_input_matrix(self):
+
+
+		"""
+		this function must be run after preprocessing gome has run
+		
+		"""
+
 		mat = []
-		for i in range(len(self.y)):
-			lat_corner = self.gome.lat_corners[i]
-			lon_corner = self.gome.lon_corners[i]
-			print(lat_corner, lon_corner)
-			cdl_proportion = self.get_cdl_proportion_gome(lat_corner, lon_corner)
-			time_ind = self.par.get_time_ind(self.date, self.gome.time[i])
-			par_val = self.par.get_weighted_par(lon_corner, lat_corner, time_ind)
-			fpari = self.get_fpari(lat_corner, lon_corner)
+		print(self.date)
+		print('building gome input matrix')
+		print('y',self.y)
+		with open(str(self.date) + '.txt', 'w') as f:
+		#loop through all the bounding box in gome array
+			for i in range(len(self.y)):
+				lat_corner = self.gome.lat_corners[i]
+				lon_corner = self.gome.lon_corners[i]
+				print(lat_corner, lon_corner, file = f)
 
-			# print(cdl_proportion, fpari, par_val, fpari * cdl_proportion * par_val)
-			mat.append(fpari * cdl_proportion * par_val)
+				cdl_proportion = self.get_cdl_proportion_gome(lat_corner, lon_corner)
+				#get the time index in par data
+				time_ind = self.par.get_time_ind(self.date, self.gome.time[i])
+				#get the weighted par for gome regression
+				par_val = self.par.get_weighted_par(lon_corner, lat_corner, time_ind)
+				#get the according fpari in the gome bounding box
+				fpari = self.get_fpari(lat_corner, lon_corner)
+				print('time', self.gome.time[i], file = f)
+				print('cdl','fpari', 'parval', cdl_proportion, fpari, par_val, file = f)
+				mat.append(fpari * cdl_proportion * par_val)
 
-		self.X = np.array(mat)
+			self.X = np.array(mat)
 		return np.array(mat)
 
 
-	def preprocess_gome(self):
-		prefix = 'E:\\SIF data\\GOME_2016\\GOME_2016\\'
-		gome_path = '07\\ret_f_nr5_nsvd12_v26_waves734_nolog.20160708_v27_all.nc'
-		date_ = datetime.date(2016, 7, 8)
-		self.date = date_
-		cd = cdl_utils()
+	def preprocess_par(self):
+
+		"""
+		preprocess the par object which is needed in the workflow
+		
+		"""
+		print('preprocessing par')
 		my_par = par_utils()
-		gome = GNOME_utils(cd)
-		gome.load_gnome(gome_path, date_)
-		gome.get_clean_gmone_data()
-		t = gome.convert_time_data(gome.time)
-		self.y = gome.GOME_sif
-		self.gome = gome
 		self.par = my_par
 
+
+		#the gome object must be cleared after processing
+	def process_gome(self, gome_date, prefix):
+
+		"""
+		gome_dates is a datetime object
+
+		"""
+
+		
+		gome = GNOME_utils(self.fp_workflow.cdl_)
+		self.gome = gome
+		gome_path = convertGOMEDate(gome_date, prefix)
+		print('gome_path', gome_path)
+		self.gome.load_gnome(gome_path, gome_date)
+		self.gome.get_clean_gmone_data()
+		self.gome.convert_time_data(self.gome.time)
+		self.y = self.gome.GOME_sif
+		self.date = gome_date
+
+
 	def preprocess_cdl(self):
-		fpar_path = 'FPAR_A2016185.hdf'
+
+		print('preprocessing cdl')
+		fpar_path = 'FPAR_A2016169.hdf'
 		cdl_path = 'cdl_chicago.npy'
 		self.fp_workflow = Fpar_flow()
 		self.fp_workflow.preprocess(fpar_path, cdl_path)
@@ -80,9 +114,12 @@ class Gome_workflow:
 		assert self.X != None and self.y != None
 		result = lstsq(self.X, self.y)
 		model = sm.OLS(self.y, self.X).fit()
-		print(model.summary())
+		# print(model.summary())
 		coeffs = result[0]
 		return coeffs
+
+
+
 
 
 
