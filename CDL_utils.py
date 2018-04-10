@@ -4,6 +4,8 @@ from my_functions import *
 # from osgeo import gdal
 from helper import *
 import sifutil
+import re
+from dbfread import DBF
 
 class cdl_utils:
 
@@ -27,13 +29,68 @@ class cdl_utils:
  
 
 	def load_cdl(self, path):
+		self.get_crop_label()
 		data = gdal.Open(path)
 		data = data.ReadAsArray()
 		self.cdl_data = data
 		return data
 
 
+
+	def get_crop_label(self):
+
+
+		"""
+		get the accordingly corn labels in the cdl data
+		build a hashtable which takes a number as an input and returns the according crop label
+		e.g. self.crop_label[1] = 'corn'
+				 self.crop_label[5] = 'soybeans'
+
+		"""
+		data = DBF('configuration/cdl.dbf')
+		dataset = []
+		for i in data:
+			if i['CLASS_NAME'] != '':
+				dataset.append(i)
+		pattern = re.compile(r'\bWater\b|Undefined|Developed|Clouds|Background|Aquaculture')
+		non_empty = set()
+		non_veg = set()
+		forest = set()
+		corns = set()
+		soybeans = set()
+		for i, obj in enumerate(dataset):
+			if obj['CLASS_NAME'] != '':
+				non_empty.add(obj['VALUE'])
+
+			if re.findall(pattern, obj['CLASS_NAME']) != []:
+				non_veg.add(obj['VALUE'])
+
+			if re.findall(r'forest|Forest', obj['CLASS_NAME']) != []:
+				forest.add(obj['VALUE'])
+
+			if re.findall(r'corn|Corn', obj['CLASS_NAME']) != []:
+				corns.add(obj['VALUE'])
+
+			if re.findall(r'soybean|Soybean', obj['CLASS_NAME']) != []:
+				soybeans.add(obj['VALUE'])
+
+		grass = non_empty - non_veg - corns - forest - soybeans
+		crop_label = ['' for i in range(256)]
+		
+		for i in grass:
+			crop_label[i] = 'grass'
+		for i in corns:
+			crop_label[i] = 'corn'
+		for i in soybeans:
+			crop_label[i] = 'soybeans'
+		for i in forest:
+			crop_label[i] = 'forest'
+
+		self.crop_label = crop_label
+
+
 	def load_np_cdl(self, path):
+		self.get_crop_label()
 		self.cdl_data = np.load(path)
 		return np.load(path)
 
@@ -50,23 +107,26 @@ class cdl_utils:
 		return (int((self.ulat - projection[1])/30), -int((self.llon - projection[0])/30))
 
 
-	#input a 2d matrix consist of cdl labels
-	#return the proportion of each type of crops in that matrix
-
 	def get_proportion(self, submat):
 
 
+		"""
+		input a 2d matrix consist of cdl labels
+		return the proportion of each type of crops in that matrix
+		The order of proportion matrix is 'corn':0, 'soybeans':1, 'grass':2, 'forest':3
+		
+		"""
+
 		row = np.array([0,0,0,0], dtype=float)
 
-
 		unique_elements, counts_elements = np.unique(submat, return_counts=True)
-		indices_map = {1:0, 5:1, 176:2}
+
+		indices_map = {'corn':0, 'soybeans':1, 'grass':2, 'forest':3}
+
 		for num, count in zip(unique_elements, counts_elements):
-			if num == 1 or num == 5 or num == 176:
-				row[indices_map[num]] = count
-			else:
-				row[3] += count
-		
+			if self.crop_label[num] != '':
+				row[indices_map[self.crop_label[num]]] += count
+
 		if np.sum(row) == 0:
 			return row
 

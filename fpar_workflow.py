@@ -56,7 +56,7 @@ class Fpar_flow:
 		assert self.cdl_matrix != None and self.fpar_vals != None
 		result = lstsq(self.cdl_matrix, self.fpar_vals)
 		self.reg_coeffs = result[0]
-		print(result)
+		# print(result)
 		return result
 
 

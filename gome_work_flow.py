@@ -61,18 +61,16 @@ class Gome_workflow:
 
 
 		#the gome object must be cleared after processing
-	def process_gome(self, gome_date, prefix):
+	def process_gome(self, gome_date, prefix, min_lon =None, max_lon = None, min_lat = None, max_lat= None):
 
 		"""
 		gome_dates is a datetime object
 
 		"""
-
-		
-		gome = GNOME_utils(self.fp_workflow.cdl_)
+		print('processing gome')
+		gome = GNOME_utils(self.fp_workflow.cdl_, min_lon, max_lon, min_lat, max_lat)
 		self.gome = gome
 		gome_path = convertGOMEDate(gome_date, prefix)
-		print('gome_path', gome_path)
 		self.gome.load_gnome(gome_path, gome_date)
 		self.gome.get_clean_gmone_data()
 		self.gome.convert_time_data(self.gome.time)
@@ -83,8 +81,8 @@ class Gome_workflow:
 	def preprocess_cdl(self):
 
 		print('preprocessing cdl')
-		fpar_path = 'FPAR_A2016169.hdf'
-		cdl_path = 'cdl_chicago.npy'
+		fpar_path = 'data/FPAR_A2016169.hdf'
+		cdl_path = 'data/cdl_chicago.npy'
 		self.fp_workflow = Fpar_flow()
 		self.fp_workflow.preprocess(fpar_path, cdl_path)
 
