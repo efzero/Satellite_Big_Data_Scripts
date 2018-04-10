@@ -41,9 +41,6 @@ class fpar_utils:
     p2 = self.coords_to_ind(ru[0], ru[1])
     p3 = self.coords_to_ind(rb[0], rb[1])
     p4 = self.coords_to_ind(lb[0], lb[1])
-    print(p1, p2)
-    print(p3, p4)
-
     polygon = Polygon((p1, p2, p3, p4))
     indices = points_inside_polygon(polygon, p1, p2, p3, p4)
 
