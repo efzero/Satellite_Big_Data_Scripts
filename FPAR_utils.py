@@ -26,6 +26,7 @@ class fpar_utils:
       data = SD(path, SDC.READ)
       self.fpar = np.array(data.select('Fpar_500m')[:])
       self.qc = np.array(data.select('FparExtra_QC')[:])
+      self._laiqc = np.array(data.select('FparLai_QC')[:])
       return True
 
     except:
@@ -47,9 +48,13 @@ class fpar_utils:
     return indices
 
 
-  #input latitude and longitude
-  #return the according indices on fpar grid
   def coords_to_ind(self, lat, lon):
+
+    """
+    input latitude and longitude
+    return the according indices on fpar grid
+    """
+    
     lon_diff = lon - self.west
     lat_diff = self.north - lat
 
@@ -58,10 +63,13 @@ class fpar_utils:
     return (lat_ind, lon_ind)
 
 
-  #input lat and lon indices on modis fpar data
-  #return the according latitude and longitude of that data 
   def get_fpar_coords(self, lat_ind, lon_ind):
-    
+
+    """
+    input lat and lon indices on modis fpar data
+    return the according latitude and longitude of that data
+    """
+ 
     lat = self.north - lat_ind / self.lat_num * (self.north - self.south)
     lon = self.west + lon_ind / self.lon_num * (self.east - self.west)
     return (lon, lat)
@@ -81,6 +89,14 @@ class fpar_utils:
       return None
 
   def get_fpar_bound(self, lat_ind, lon_ind):
+
+    """
+    args:lat index and lon index
+    input:　lat index, lon index of the fpar data (left up corner)
+    returns: the min_lon, max_lon, min_lat, max_lat of the corresponding bounding box of fpar
+
+
+    """
 
     assert lat_ind >= 0 and lon_ind >= 0
     lu = self.get_fpar_coords(lat_ind, lon_ind)
@@ -107,6 +123,54 @@ class fpar_utils:
       qc_values.append(fp_qc)
 
     return fp_values, qc_values
+
+
+
+  def get_fpar_directedly(self, lo, hi, left, right):
+
+    """
+    @input the four borders of the fpar array
+    @return the sliced fpar matrix
+
+    """
+    return self.fpar[lo:hi, left:right], self.qc[lo:hi, left:right], self._laiqc[lo:hi, left:right]
+
+  
+  def strong_filter_fpar(self, fpar, qc, laiqc):
+
+    """
+    @given fpar, extra qc and lai qc
+    @return the filtered fpar
+
+    Args: 
+      fpar, qc, laiqc
+    Returns:
+      strongly filtered fpar, missing value filled with -1  
+
+    """
+    ret = np.zeros(fpar.shape)
+    for i in range(qc.shape[0]):
+      for j in range(qc.shape[1]):
+        lai_qc_info = convert_binary(laiqc[i,j])
+        extra_qc_info = convert_binary(qc[i,j])[1:]
+
+        if lai_qc_info == '00000000' and (extra_qc_info == '0000000' or extra_qc_info == '0001000'):
+          ret[i,j] = fpar[i,j]
+
+        else:
+          ret[i,j] = np.NaN
+
+    return ret
+
+
+
+
+
+
+
+
+
+
 
 
 
