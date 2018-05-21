@@ -3,8 +3,6 @@ from datetime import timedelta, date
 from gome_work_flow import *
 
 def main():
-	print('fucjk')
-
 
 	X = np.empty((0,4))
 	y = np.array([])
@@ -57,6 +55,12 @@ def sliding_window(min_lon, max_lon, min_lat, max_lat, start_date, timeperiod):
 
 	"""
 	run the sliding window algorithm
+	
+	Args:
+	     the bounding box of the window, and the timeperiod of the sliding
+	     
+	Returns:
+	     The input matrix X and labels y for SIF regression
 
 	"""
 	X = np.empty((0,4))
